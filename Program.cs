@@ -15,11 +15,8 @@ class Program
         OllamaClient clientOllama = new OllamaClient("http://localhost:11434/api/generate");
         DiscordClient discordClient = new DiscordClient(_token, clientOllama);
 
-        await Task.Run(() => { Console.WriteLine(132); });
+        await discordClient.Initialize();
 
-        discordClient.Initialize();
-
-        // Бот работает в фоновом режиме, пока не будет закрыт
         await Task.Delay(-1);
     }
 
