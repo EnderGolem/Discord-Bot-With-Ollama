@@ -13,7 +13,7 @@ internal class DiscordClient
     private readonly DiscordSocketClient _clientSocketDiscord;
     private readonly string _token;
 
-    private Dictionary<string, Queue<string>> historyChatsOfChannel = new(); 
+    private Dictionary<ulong, Queue<string>> historyChatsOfChannel = new(); 
 
     public DiscordClient(string token, OllamaClient ollamaClient)
     {
@@ -68,29 +68,26 @@ internal class DiscordClient
         if (arg.Content.Contains("/ping"))
         {
 
-            await arg.Channel.SendMessageAsync(
-                    text: $"pong!",
-                    messageReference: messageReference
-                );
+            await arg.Channel.SendMessageAsync(text: $"pong!", messageReference: messageReference);
             return;
         }
 
-        AddToHistory(arg.Channel.Name, arg.Author.Username, arg.Content);
+        AddToHistory(arg.Channel.Id, arg.Author.Username, arg.Content);
 
 
-        _ = Task.Run(() => GenerateAndSendMessage(arg.Channel, GetMessageFromHistory(arg.Channel.Name), messageReference));
+        _ = Task.Run(() => GenerateAndSendMessage(arg.Channel, GetMessageFromHistory(arg.Channel.Id), messageReference));
     }
 
     private async Task GenerateAndSendMessage(ISocketMessageChannel channel, string message, MessageReference messageReference)
     {
         //TODO вынести это в отдельную обработку, чтобы он мог продолжать слушать, даже когда генерирует ответ
         var answer = await _clientOllama.GetResponseAsync(message);
-        AddToHistory(channel.Name, _clientOllama.Name, answer);
+        AddToHistory(channel.Id, _clientOllama.Name, answer);
         Console.WriteLine($"Sending message: {answer}");
         await channel.SendMessageAsync(text: answer, messageReference: messageReference);
     }
 
-    private string GetMessageFromHistory(string channel) 
+    private string GetMessageFromHistory(ulong channel) 
     {
         StringBuilder sb = new StringBuilder();
 
@@ -100,7 +97,7 @@ internal class DiscordClient
         return sb.ToString();
     }
 
-    private void AddToHistory(string channel, string author, string message)
+    private void AddToHistory(ulong channel, string author, string message)
     {
         if(historyChatsOfChannel.ContainsKey(channel))
              historyChatsOfChannel[channel].Enqueue($"{author}: {message}");
