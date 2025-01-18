@@ -12,7 +12,16 @@ class Program
 
     static async Task Main(string[] args)
     {
-        OllamaClient clientOllama = new OllamaClient("http://localhost:11434/api/generate");
+        string name = "Лами";
+        string prompt = $"Ты {name} чат бот." +
+                        $"1) Учитывай историю чтобы сохранить контекст " +
+                        $"2) Веди себя как пользователь дискорд серверов" +
+                        $"3) Пиши коротко и дружелюбно, используя 1–2 предложения " +
+                        $"4) Отвечай только на русском языке. " +
+                            $"Вот история переписки: {"#InnerPrompt"}" +
+                            $"Ответь на последнее сообщение, как {name}.";
+
+        OllamaClient clientOllama = new OllamaClient("http://localhost:11434/api/generate", "Лами", prompt);
         DiscordClient discordClient = new DiscordClient(_token, clientOllama);
 
         await discordClient.Initialize();

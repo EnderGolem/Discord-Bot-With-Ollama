@@ -8,23 +8,23 @@ public class OllamaClient
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiUrl;
+    private readonly string _prompt;
+    
+    public string Name { get; private set; }
 
-    public OllamaClient(string apiUrl)
+    public OllamaClient(string apiUrl, string name, string prompt)
     {
         _httpClient = new HttpClient();
         _apiUrl = apiUrl;
+        _prompt = prompt;
+
+        Name = name;
     }
 
     public async Task<string> GetResponseAsync(string prompt)
     {
 
-        var requestContent = new { model = "llama3", prompt = $"Ты Лами чат бот." +
-                                            $"1) Учитывай историю чтобы сохранить контекст " +
-                                            $"2) Веди себя как пользователь дискорд серверов" +
-                                            $"3) Пиши коротко и дружелюбно, используя 1–2 предложения " +
-                                            $"4) Отвечай только на русском языке. " +
-                                             $"Вот история переписки: {prompt}" +
-                                             $"Ответь на последнее сообщение, как Лами." };
+        var requestContent = new { model = "llama3", prompt = _prompt.Replace("#InnerPrompt", prompt) };
 
         var jsonContent = JsonConvert.SerializeObject(requestContent);
         var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

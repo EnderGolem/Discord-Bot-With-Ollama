@@ -85,7 +85,7 @@ internal class DiscordClient
     {
         //TODO вынести это в отдельную обработку, чтобы он мог продолжать слушать, даже когда генерирует ответ
         var answer = await _clientOllama.GetResponseAsync(message);
-        AddToHistory(channel.Name, "Лами", answer);
+        AddToHistory(channel.Name, _clientOllama.Name, answer);
         Console.WriteLine($"Sending message: {answer}");
         await channel.SendMessageAsync(text: answer, messageReference: messageReference);
     }
