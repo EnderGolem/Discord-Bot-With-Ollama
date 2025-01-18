@@ -57,24 +57,37 @@ internal class DiscordClient
 
         Console.WriteLine($"Received: {arg.Content} from {arg.Author.Username}");
 
+
+
+        var messageReference = new MessageReference(
+                messageId: arg.Id,
+                channelId: arg.Channel.Id,
+                guildId: (arg.Channel as SocketGuildChannel)?.Guild.Id
+            );
+
         if (arg.Content.Contains("/ping"))
         {
-            await arg.Channel.SendMessageAsync("Pong!");
+
+            await arg.Channel.SendMessageAsync(
+                    text: $"pong!",
+                    messageReference: messageReference
+                );
             return;
         }
 
         AddToHistory(arg.Channel.Name, arg.Author.Username, arg.Content);
-    
-        _ = Task.Run(() => GenerateAndSendMessage(arg.Channel, GetMessageFromHistory(arg.Channel.Name)));
+
+
+        _ = Task.Run(() => GenerateAndSendMessage(arg.Channel, GetMessageFromHistory(arg.Channel.Name), messageReference));
     }
 
-    private async Task GenerateAndSendMessage(ISocketMessageChannel channel, string message)
+    private async Task GenerateAndSendMessage(ISocketMessageChannel channel, string message, MessageReference messageReference)
     {
         //TODO вынести это в отдельную обработку, чтобы он мог продолжать слушать, даже когда генерирует ответ
         var answer = await _clientOllama.GetResponseAsync(message);
         AddToHistory(channel.Name, "Лами", answer);
         Console.WriteLine($"Sending message: {answer}");
-        await channel.SendMessageAsync(answer);
+        await channel.SendMessageAsync(text: answer, messageReference: messageReference);
     }
 
     private string GetMessageFromHistory(string channel) 
