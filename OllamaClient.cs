@@ -8,14 +8,16 @@ public class OllamaClient
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiUrl;
+    private readonly string _system;
     private readonly string _prompt;
     
     public string Name { get; private set; }
 
-    public OllamaClient(string apiUrl, string name, string prompt)
+    public OllamaClient(string apiUrl, string name, string system, string prompt)
     {
         _httpClient = new HttpClient();
         _apiUrl = apiUrl;
+        _system = system;
         _prompt = prompt;
 
         Name = name;
@@ -24,7 +26,7 @@ public class OllamaClient
     public async Task<string> GetResponseAsync(string prompt)
     {
 
-        var requestContent = new { model = "llama3", prompt = _prompt.Replace("#InnerPrompt", prompt) };
+        var requestContent = new { model = "llama3", system = _system, prompt = _prompt.Replace("#InnerPrompt", prompt) };
 
         var jsonContent = JsonConvert.SerializeObject(requestContent);
         var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
