@@ -1,11 +1,6 @@
-﻿using Discord;
-using Discord.WebSocket;
-using System.Text;
-using Newtonsoft.Json;
+﻿namespace DiscordBot;
 
-namespace DiscordBot;
-
-
+//TODO попытаться запустить на сервере
 class Program
 {
     private static string _token = "MTMxNTc0MDkwMTQ2MDU0NTU1Ng.G4XWE3.NiaVNuVDRyONFxP5ve_92d8oNMPO12Rr3oLUf8";
@@ -26,8 +21,19 @@ class Program
 
         await discordClient.Initialize();
 
+
+        var _ = RunLoopAsync(() => discordClient.ProcessQueueOfMessages(), 1000);
+
         await Task.Delay(-1);
     }
 
-
+    //TODO Переписать на IHostedService , как я понял это что-то связанное с BackgroundService и выглядит современно, со слов ИИ
+    private static async Task RunLoopAsync(Action action, int repeatTime, CancellationToken token = default)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            action();
+            await Task.Delay(repeatTime, token);
+        }
+    }
 }

@@ -2,6 +2,7 @@
 using Discord;
 using System.Text;
 using System.Linq;
+using DiscordBot.Classes;
 
 namespace DiscordBot;
 
@@ -12,10 +13,11 @@ internal class DiscordClient
     private readonly DiscordSocketClient _clientSocketDiscord;
     private readonly string _token;
 
+    private Queue<MessageData> _queueMessages = new();
+
 
     public DiscordClient(string token, OllamaClient ollamaClient)
     {
-
         _clientOllama = ollamaClient;
         _token = token;
 
@@ -56,7 +58,6 @@ internal class DiscordClient
         Console.WriteLine($"Received: {arg.Content} from {arg.Author.Username}");
 
 
-
         var messageReference = new MessageReference(
                 messageId: arg.Id,
                 channelId: arg.Channel.Id,
@@ -70,18 +71,24 @@ internal class DiscordClient
             return;
         }
 
-       _clientOllama.AddToHistory(arg.Channel.Id, arg.Author.Username, arg.Content);
-
-
-        _ = Task.Run(() => GenerateAndSendMessage(arg.Channel, _clientOllama.GetMessageFromHistory(arg.Channel.Id), messageReference));
+        _clientOllama.AddToHistory(arg.Channel.Id, arg.Author.Username, arg.Content);
+        _queueMessages.Enqueue(new(DateTime.UtcNow, arg.Content, arg.Channel, messageReference));
     }
 
-    private async Task GenerateAndSendMessage(ISocketMessageChannel channel, string message, MessageReference messageReference)
+    public void ProcessQueueOfMessages()
     {
-        //TODO вынести это в отдельную обработку, чтобы он мог продолжать слушать, даже когда генерирует ответ
-        var answer = await _clientOllama.GetResponseAsync(message);
-        _clientOllama.AddToHistory(channel.Id, _clientOllama.Name, answer);
-        Console.WriteLine($"Sending message: {answer}");
-        await channel.SendMessageAsync(text: answer, messageReference: messageReference);
+        if (_queueMessages.Any())
+        {
+            var messageData = _queueMessages.Dequeue();
+
+            if (messageData.Timestamp.AddSeconds(20) < DateTime.UtcNow)
+                return;
+
+            var answer = _clientOllama.GetResponseAsync(_clientOllama.GetMessageFromHistory(messageData.Channel.Id)).Result;
+            
+            Console.WriteLine($"Sending message: {answer}");
+            _clientOllama.AddToHistory(messageData.Channel.Id, _clientOllama.Name, answer);
+            messageData.Channel.SendMessageAsync(text: answer, messageReference: messageData.Reference);
+        }
     }
 }
