@@ -1,22 +1,28 @@
 ﻿using Discord;
 using DiscordBot.Classes;
 using Newtonsoft.Json;
+using System;
 using System.Text;
 
 namespace DiscordBot;
 
 public class OllamaClient
 {
-    private const int _maxCountOfMessagesInHistory = 7;
+    private const int _maxCountOfMessagesInHistory = 20;
 
-    private readonly HttpClient _httpClient;
     private readonly string _apiUrl;
     private readonly string _system;
     private readonly string _prompt;
+    private readonly HttpClient _httpClient;
+    private readonly Random _random = new();
+
 
     private Dictionary<ulong, Queue<string>> historyChatsOfChannel = new();
 
     public string Name { get; private set; }
+
+    //TODO сделать отдельную настройку по чатам
+    public bool AlwaysResponse { get; set; } = true;
 
     public OllamaClient(string apiUrl, string name, string system, string prompt)
     {
@@ -28,8 +34,13 @@ public class OllamaClient
         Name = name;
     }
 
-    public async Task<string> GetResponseAsync(string prompt)
+    public async Task<string?> GetResponseAsync(string prompt)
     {
+
+        if (!AlwaysResponse && _random.Next(0, 101) > 10)
+            return null;
+
+
 
         var requestContent = new { model = "llama3", system = _system, prompt = _prompt.Replace("#InnerPrompt", prompt) };
 

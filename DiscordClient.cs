@@ -55,7 +55,7 @@ internal class DiscordClient
         if (arg.Author.IsBot)
             return;
 
-        Console.WriteLine($"Received: {arg.Content} from {arg.Author.Username}");
+        Console.WriteLine($"Received: {arg.Content} from {arg.Author.Username} channel: {arg.Channel.Name}");
 
 
         var messageReference = new MessageReference(
@@ -68,6 +68,12 @@ internal class DiscordClient
         {
 
             await arg.Channel.SendMessageAsync(text: $"pong!", messageReference: messageReference);
+            return;
+        }
+        if (arg.Content.Contains("/alwaysChat"))
+        {
+            _clientOllama.AlwaysResponse = !_clientOllama.AlwaysResponse;
+            await arg.Channel.SendMessageAsync(text: $"I {(_clientOllama.AlwaysResponse ? "always response now" : "response with chance")}", messageReference: messageReference);
             return;
         }
 
@@ -85,7 +91,9 @@ internal class DiscordClient
                 return;
 
             var answer = _clientOllama.GetResponseAsync(_clientOllama.GetMessageFromHistory(messageData.Channel.Id)).Result;
-            
+            if (string.IsNullOrEmpty(answer))
+                return;
+
             Console.WriteLine($"Sending message: {answer}");
             _clientOllama.AddToHistory(messageData.Channel.Id, _clientOllama.Name, answer);
             messageData.Channel.SendMessageAsync(text: answer, messageReference: messageData.Reference);
