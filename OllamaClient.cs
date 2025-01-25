@@ -32,15 +32,11 @@ public class OllamaClient
         Name = name;
     }
 
-    public async Task<string?> GetResponseAsync(string prompt)
+    public async Task<string?> GetResponseAsync(object requestContent)
     {
-
+        
         if (!AlwaysResponse && _random.Next(0, 101) > 10)
             return null;
-
-
-
-        var requestContent = new { model = "llama3", system = _system, prompt = _prompt.Replace("#InnerPrompt", prompt) };
 
         var jsonContent = JsonConvert.SerializeObject(requestContent);
         var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -80,7 +76,16 @@ public class OllamaClient
             return $"An error occurred: {ex.Message}";
         }
     }
-    public string GetMessageFromHistory(ulong channel)
+
+    public object CreateRequestContent(ulong channel)
+    {
+        var history = GetMessageFromHistory(channel);
+        var requestContent = new { model = "llama3", system = _system, prompt = _prompt.Replace("#InnerPrompt", history) };
+        
+        return requestContent;
+    }
+
+    private string GetMessageFromHistory(ulong channel)
     {
         StringBuilder sb = new StringBuilder();
 

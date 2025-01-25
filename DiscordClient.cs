@@ -88,7 +88,7 @@ internal class DiscordClient
             if (messageData.Timestamp.AddSeconds(20) < DateTime.UtcNow)
                 return;
 
-            var answer = _clientOllama.GetResponseAsync(_clientOllama.GetMessageFromHistory(messageData.Channel.Id)).Result;
+            var answer = _clientOllama.GetResponseAsync(_clientOllama.CreateRequestContent(messageData.Channel.Id)).Result;
             if (string.IsNullOrEmpty(answer))
                 return;
 
