@@ -1,7 +1,5 @@
-﻿using Discord;
-using DiscordBot.Classes;
+﻿using DiscordBot.Classes;
 using Newtonsoft.Json;
-using System;
 using System.Text;
 
 namespace DiscordBot;

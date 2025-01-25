@@ -1,7 +1,5 @@
-﻿using Discord.WebSocket;
-using Discord;
-using System.Text;
-using System.Linq;
+﻿using Discord;
+using Discord.WebSocket;
 using DiscordBot.Classes;
 
 namespace DiscordBot;
