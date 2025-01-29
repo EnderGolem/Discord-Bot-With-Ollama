@@ -1,10 +1,11 @@
 ﻿using DiscordBot.Classes;
+using DiscordBot.OllamaClasses;
 using Newtonsoft.Json;
 using System.Text;
 
 namespace DiscordBot;
 
-public class OllamaClient
+public class OllamaClient : IOllamaChat
 {
     private const int _maxCountOfMessagesInHistory = 20;
 

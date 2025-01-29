@@ -1,4 +1,6 @@
-﻿namespace DiscordBot;
+﻿using DiscordBot.OllamaClasses;
+
+namespace DiscordBot;
 
 //TODO попытаться запустить на сервере
 class Program
@@ -16,7 +18,7 @@ class Program
         string prompt = $"Вот история переписки: {"#InnerPrompt"}" +
                             $"Ответь на последнее сообщение, как {name}.";
 
-        OllamaClient clientOllama = new OllamaClient("http://localhost:11434/api/generate", "Лами", system, prompt);
+        IOllamaChat clientOllama = new OllamaClient("http://localhost:11434/api/generate", "Лами", system, prompt);
         DiscordClient discordClient = new DiscordClient(_token, clientOllama);
 
         await discordClient.Initialize();

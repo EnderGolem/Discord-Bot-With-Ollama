@@ -1,20 +1,21 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using DiscordBot.Classes;
+using DiscordBot.OllamaClasses;
 
 namespace DiscordBot;
 
 internal class DiscordClient
 {
 
-    private readonly OllamaClient _clientOllama;
+    private readonly IOllamaChat _clientOllama;
     private readonly DiscordSocketClient _clientSocketDiscord;
     private readonly string _token;
 
     private Queue<MessageData> _queueMessages = new();
 
 
-    public DiscordClient(string token, OllamaClient ollamaClient)
+    public DiscordClient(string token, IOllamaChat ollamaClient)
     {
         _clientOllama = ollamaClient;
         _token = token;
