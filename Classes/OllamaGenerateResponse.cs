@@ -2,7 +2,7 @@
 
 namespace DiscordBot.Classes;
 
-public class OllamaResponse
+public class OllamaGenerateResponse
 {
     [JsonProperty("model")]
     public string Model { get; set; }

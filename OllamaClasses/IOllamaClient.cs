@@ -1,6 +1,6 @@
 ﻿namespace DiscordBot.OllamaClasses;
 
-internal interface IOllamaChat
+internal interface IOllamaClient
 {
     string Name { get; }
     bool AlwaysResponse { get; set; }

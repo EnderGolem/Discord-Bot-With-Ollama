@@ -8,14 +8,14 @@ namespace DiscordBot;
 internal class DiscordClient
 {
 
-    private readonly IOllamaChat _clientOllama;
+    private readonly IOllamaClient _clientOllama;
     private readonly DiscordSocketClient _clientSocketDiscord;
     private readonly string _token;
 
     private Queue<MessageData> _queueMessages = new();
 
 
-    public DiscordClient(string token, IOllamaChat ollamaClient)
+    public DiscordClient(string token, IOllamaClient ollamaClient)
     {
         _clientOllama = ollamaClient;
         _token = token;

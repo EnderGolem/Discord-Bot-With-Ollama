@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DiscordBot;
 
-public class OllamaClient : IOllamaChat
+public class OllamaClientGenerate : IOllamaClient
 {
     private const int _maxCountOfMessagesInHistory = 20;
 
@@ -23,7 +23,7 @@ public class OllamaClient : IOllamaChat
     //TODO сделать отдельную настройку по чатам
     public bool AlwaysResponse { get; set; } = true;
 
-    public OllamaClient(string apiUrl, string name, string system, string prompt)
+    public OllamaClientGenerate(string apiUrl, string name, string system, string prompt)
     {
         _httpClient = new HttpClient();
         _apiUrl = apiUrl;
@@ -53,11 +53,11 @@ public class OllamaClient : IOllamaChat
 
             string responseBody = await response.Content.ReadAsStringAsync();
             string[] lines = responseBody.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            var responseObjects = new List<OllamaResponse>();
+            var responseObjects = new List<OllamaGenerateResponse>();
 
             foreach (var line in lines)
             {
-                var responseObject = JsonConvert.DeserializeObject<OllamaResponse>(line);
+                var responseObject = JsonConvert.DeserializeObject<OllamaGenerateResponse>(line);
                 if (responseObject != null)
                 {
                     responseObjects.Add(responseObject);
