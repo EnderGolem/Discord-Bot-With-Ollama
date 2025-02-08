@@ -3,7 +3,6 @@
 internal interface IOllamaClient
 {
     string Name { get; }
-    bool AlwaysResponse { get; set; }
 
     Task<string?> GetResponseAsync(object requestContent);
 

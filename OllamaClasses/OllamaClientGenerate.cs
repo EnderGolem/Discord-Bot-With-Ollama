@@ -20,9 +20,6 @@ public class OllamaClientGenerate : IOllamaClient
 
     public string Name { get; private set; }
 
-    //TODO сделать отдельную настройку по чатам
-    public bool AlwaysResponse { get; set; } = true;
-
     public OllamaClientGenerate(string apiUrl, string name, string system, string prompt)
     {
         _httpClient = new HttpClient();
@@ -35,10 +32,6 @@ public class OllamaClientGenerate : IOllamaClient
 
     public async Task<string?> GetResponseAsync(object requestContent)
     {
-        
-        if (!AlwaysResponse && _random.Next(0, 101) > 10)
-            return null;
-
         var jsonContent = JsonConvert.SerializeObject(requestContent);
         var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 

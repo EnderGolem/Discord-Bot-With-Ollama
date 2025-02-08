@@ -13,7 +13,7 @@ internal class DiscordClient
     private readonly string _token;
 
     private Queue<MessageData> _queueMessages = new();
-
+    private Dictionary<ulong, bool> _alwaysResponse = new();
 
     public DiscordClient(string token, IOllamaClient ollamaClient)
     {
@@ -54,6 +54,9 @@ internal class DiscordClient
         if (arg.Author.IsBot)
             return;
 
+        if (!_alwaysResponse.ContainsKey(arg.Channel.Id))
+            _alwaysResponse[arg.Channel.Id] = true;
+
         Console.WriteLine($"Received: {arg.Content} from {arg.Author.Username} channel: {arg.Channel.Name}");
 
 
@@ -71,13 +74,14 @@ internal class DiscordClient
         }
         if (arg.Content.Contains("/alwaysChat"))
         {
-            _clientOllama.AlwaysResponse = !_clientOllama.AlwaysResponse;
-            await arg.Channel.SendMessageAsync(text: $"I {(_clientOllama.AlwaysResponse ? "always response now" : "response with chance")}", messageReference: messageReference);
+            _alwaysResponse[arg.Channel.Id] = !_alwaysResponse[arg.Channel.Id];
+            await arg.Channel.SendMessageAsync(text: $"I {(_alwaysResponse[arg.Channel.Id] ? "always response now" : "response with chance")}", messageReference: messageReference);
             return;
         }
 
         _clientOllama.AddToHistory(arg.Channel.Id, arg.Author.Username, arg.Content);
-        _queueMessages.Enqueue(new(DateTime.UtcNow, arg.Content, arg.Channel, messageReference));
+        if (_alwaysResponse[arg.Channel.Id])
+            _queueMessages.Enqueue(new(DateTime.UtcNow, arg.Content, arg.Channel, messageReference));
     }
 
     public void ProcessQueueOfMessages()
