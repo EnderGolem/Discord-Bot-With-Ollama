@@ -94,6 +94,7 @@ internal class DiscordClient
             if (messageData.Timestamp.AddSeconds(20) < DateTime.UtcNow)
                 return;
 
+            //TODO Разобраться почему тут надо ставить .GetAwaiter().GetResult(), а не result  и вообще каким образом образуется deadLock
             var answer = _clientOllama.GetResponseAsync(_clientOllama.CreateRequestContent(messageData.Channel.Id)).GetAwaiter().GetResult();
             if (string.IsNullOrEmpty(answer))
                 return;

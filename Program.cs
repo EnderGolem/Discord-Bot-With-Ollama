@@ -1,4 +1,5 @@
 ﻿using DiscordBot.OllamaClasses;
+using Microsoft.Extensions.Configuration;
 
 namespace DiscordBot;
 
@@ -9,6 +10,13 @@ class Program
 
     static async Task Main(string[] args)
     {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        string token = configuration["Discord:Token"]!;
+
         string name = "Лами";
         string system = $"Ты {name} чат бот." +
                         $"1) Учитывай историю чтобы сохранить контекст." +
