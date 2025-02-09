@@ -1,7 +1,6 @@
 ﻿
 using DiscordBot.Classes;
 using Newtonsoft.Json;
-using System.Net.Http;
 using System.Text;
 
 namespace DiscordBot.OllamaClasses;
@@ -60,7 +59,7 @@ public class OllamaClientChat : IOllamaClient
     public void AddToHistory(ulong channel, string author, string message)
     {
         if (historyChatsOfChannel.ContainsKey(channel))
-            historyChatsOfChannel[channel].Enqueue((author,message));
+            historyChatsOfChannel[channel].Enqueue((author, message));
         else
             historyChatsOfChannel[channel] = new Queue<(string author, string message)>(new[] { (author, message) });
 
@@ -83,7 +82,9 @@ public class OllamaClientChat : IOllamaClient
             messages = (new[] { new { role = "system", content = _system } }).Concat(messages).ToArray();
 
 
-        object requestContent = new { model = "llama3",
+        object requestContent = new
+        {
+            model = "llama3",
             messages = messages,
             stream = false
         };

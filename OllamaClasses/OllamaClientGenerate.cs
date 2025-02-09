@@ -75,7 +75,7 @@ public class OllamaClientGenerate : IOllamaClient
     {
         var history = GetMessageFromHistory(channel);
         var requestContent = new { model = "llama3", system = _system, prompt = _prompt.Replace("#InnerPrompt", history) };
-        
+
         return requestContent;
     }
 
