@@ -72,16 +72,17 @@ internal class DiscordClient
             await arg.Channel.SendMessageAsync(text: $"pong!", messageReference: messageReference);
             return;
         }
+
         if (arg.Content.Contains("/alwaysChat"))
         {
             _alwaysResponse[arg.Channel.Id] = !_alwaysResponse[arg.Channel.Id];
-            await arg.Channel.SendMessageAsync(text: $"I {(_alwaysResponse[arg.Channel.Id] ? "always response now" : "response with chance")}", messageReference: messageReference);
+            await arg.Channel.SendMessageAsync(text: $"I {(_alwaysResponse[arg.Channel.Id] ? "always respond now" : "respond only when mentioned")}", messageReference: messageReference);
             return;
         }
 
         _clientOllama.AddToHistory(arg.Channel.Id, arg.Author.Username, arg.Content);
-        if (_alwaysResponse[arg.Channel.Id])
-            _queueMessages.Enqueue(new(DateTime.UtcNow, arg.Content, arg.Channel, messageReference));
+        if (_alwaysResponse[arg.Channel.Id] || CheckBotMentioned(arg))
+            _queueMessages.Enqueue(new(DateTime.UtcNow, arg.Content.Replace(_clientSocketDiscord.CurrentUser.Id.ToString(), _clientOllama.Name), arg.Channel, messageReference));
     }
 
     public void ProcessQueueOfMessages()
@@ -101,5 +102,10 @@ internal class DiscordClient
             _clientOllama.AddToHistory(messageData.Channel.Id, _clientOllama.Name, answer);
             messageData.Channel.SendMessageAsync(text: answer, messageReference: messageData.Reference);
         }
+    }
+
+    private bool CheckBotMentioned(SocketMessage arg)
+    {
+        return arg.MentionedUsers.Any(user => user.Id == _clientSocketDiscord.CurrentUser.Id);
     }
 }
