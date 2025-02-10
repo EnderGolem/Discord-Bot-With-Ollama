@@ -6,8 +6,6 @@ namespace DiscordBot;
 //TODO попытаться запустить на сервере
 class Program
 {
-    private static string _token = "MTMxNTc0MDkwMTQ2MDU0NTU1Ng.G4XWE3.NiaVNuVDRyONFxP5ve_92d8oNMPO12Rr3oLUf8";
-
     static async Task Main(string[] args)
     {
         var configuration = new ConfigurationBuilder()
@@ -18,7 +16,7 @@ class Program
         string token = configuration["Discord:Token"]!;
 
         IOllamaClient clientOllama = ExampleWithGenerateModel();
-        DiscordClient discordClient = new DiscordClient(_token, clientOllama);
+        DiscordClient discordClient = new DiscordClient(token, clientOllama);
 
         await discordClient.Initialize();
 
@@ -28,7 +26,6 @@ class Program
         await Task.Delay(-1);
     }
 
-    //TODO Переписать на IHostedService , как я понял это что-то связанное с BackgroundService и выглядит современно, со слов ИИ
     private static async Task RunLoopAsync(Action action, int repeatTime, CancellationToken token = default)
     {
         while (!token.IsCancellationRequested)
