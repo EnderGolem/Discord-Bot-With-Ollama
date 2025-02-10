@@ -17,16 +17,7 @@ class Program
 
         string token = configuration["Discord:Token"]!;
 
-        string name = "Лами";
-        string system = $"Ты {name} чат бот." +
-                        $"1) Учитывай историю чтобы сохранить контекст." +
-                        $"2) Веди себя как пользователь дискорд серверов." +
-                        $"3) Пиши коротко и дружелюбно, используя 1–2 предложения." +
-                        $"4) Отвечай всегда на русском языке.";
-        string prompt = $"Вот история переписки: {"#InnerPrompt"}" +
-                            $"Ответь на последнее сообщение, как {name}.";
-
-        IOllamaChat clientOllama = new OllamaClient("http://localhost:11434/api/generate", "Лами", system, prompt);
+        IOllamaClient clientOllama = ExampleWithGenerateModel();
         DiscordClient discordClient = new DiscordClient(_token, clientOllama);
 
         await discordClient.Initialize();
@@ -45,5 +36,36 @@ class Program
             action();
             await Task.Delay(repeatTime, token);
         }
+    }
+
+
+    private static IOllamaClient ExampleWithGenerateModel()
+    {
+        string name = "Лами";
+        string system = $"Ты {name} чат бот." +
+                        $"1) Учитывай историю чтобы сохранить контекст." +
+                        $"2) Веди себя как пользователь дискорд серверов." +
+                        $"3) Пиши коротко и дружелюбно, используя 1–2 предложения." +
+                        $"4) Отвечай всегда на русском языке.";
+        string prompt = $"Вот история переписки: {"#InnerPrompt"}" +
+                            $"Ответь на последнее сообщение, как {name}.";
+
+        IOllamaClient clientOllama = new OllamaClientGenerate("http://localhost:11434/api/generate", "Лами", system, prompt);
+        return clientOllama;
+    }
+
+    private static IOllamaClient ExampleWithChatModel()
+    {
+        string name = "Лами";
+        string system = $"Ты {name} чат бот." +
+                        $"1) Отвечай всегда на русском языке" +
+                        $"2) Учитывай историю чтобы сохранить контекст." +
+                        $"3) Веди себя как пользователь дискорд серверов." +
+                        $"4) Пиши коротко и дружелюбно, используя 1–2 предложения." +
+                        $"5) Отвечай ВСЕГДА на русском языке.";
+        string prompt = "";
+
+        IOllamaClient clientOllama = new OllamaClientChat("http://localhost:11434/api/chat", "Лами", system, prompt);
+        return clientOllama;
     }
 }
