@@ -66,14 +66,14 @@ internal class DiscordClient
                 guildId: (arg.Channel as SocketGuildChannel)?.Guild.Id
             );
 
-        if (arg.Content.Contains("/ping"))
+        if (arg.Content.StartsWith("/ping"))
         {
 
             await arg.Channel.SendMessageAsync(text: $"pong!", messageReference: messageReference);
             return;
         }
 
-        if (arg.Content.Contains("/alwaysChat"))
+        if (arg.Content.StartsWith("/alwaysChat"))
         {
             _alwaysResponse[arg.Channel.Id] = !_alwaysResponse[arg.Channel.Id];
             await arg.Channel.SendMessageAsync(text: $"I {(_alwaysResponse[arg.Channel.Id] ? "always respond now" : "respond only when mentioned")}", messageReference: messageReference);
