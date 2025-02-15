@@ -14,7 +14,6 @@ public class OllamaClientGenerate : IOllamaClient
     private readonly string _prompt;
     private readonly string _model;
     private readonly HttpClient _httpClient;
-    private readonly Random _random = new();
 
 
     private Dictionary<ulong, Queue<string>> historyChatsOfChannel = new();
