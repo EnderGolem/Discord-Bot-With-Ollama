@@ -5,79 +5,32 @@ using System.Text;
 
 namespace DiscordBot;
 
-public class OllamaClientGenerate : IOllamaClient
+public class OllamaClientGenerate : OllamaClientBase
 {
     private const int _maxCountOfMessagesInHistory = 20;
 
-    private readonly string _apiUrl;
-    private readonly string _system;
-    private readonly string _prompt;
-    private readonly string _model;
-    private readonly HttpClient _httpClient;
 
 
     private Dictionary<ulong, Queue<string>> historyChatsOfChannel = new();
 
-    public string Name { get; private set; }
-
-    public OllamaClientGenerate(string apiUrl, string name, string system, string prompt, string model)
+    public OllamaClientGenerate(string apiUrl, string name, string systemPrompt, string prompt, string model) : base(apiUrl, name, systemPrompt, prompt, model)
     {
-        _httpClient = new HttpClient();
-        _apiUrl = apiUrl;
-        _system = system;
-        _prompt = prompt;
-        _model = model;
-
-        Name = name;
     }
 
-    public async Task<string?> GetResponseAsync(object requestContent)
+    protected override string? ParseResponseBody(string responseBody)
     {
-        var jsonContent = JsonConvert.SerializeObject(requestContent);
-        var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+        var lines = responseBody.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var sb = new StringBuilder();
 
-        try
+        foreach (var line in lines)
         {
-            HttpResponseMessage response = await _httpClient.PostAsync(_apiUrl, httpContent);
-
-            if (!response.IsSuccessStatusCode)
+            var obj = JsonConvert.DeserializeObject<OllamaGenerateResponse>(line);
+            if (obj != null)
             {
-                throw new Exception($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+                sb.Append(obj.Response);
             }
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            string[] lines = responseBody.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            var responseObjects = new List<OllamaGenerateResponse>();
-
-            foreach (var line in lines)
-            {
-                var responseObject = JsonConvert.DeserializeObject<OllamaGenerateResponse>(line);
-                if (responseObject != null)
-                {
-                    responseObjects.Add(responseObject);
-                }
-            }
-
-            var fullResponse = new StringBuilder();
-            foreach (var obj in responseObjects)
-            {
-                fullResponse.Append(obj.Response);
-            }
-
-            return fullResponse.ToString();
         }
-        catch (Exception ex)
-        {
-            return $"An error occurred: {ex.Message}";
-        }
-    }
-
-    public object CreateRequestContent(ulong channel)
-    {
-        var history = GetMessageFromHistory(channel);
-        var requestContent = new { model = _model, system = _system, prompt = _prompt.Replace("#InnerPrompt", history) };
-
-        return requestContent;
+        return sb.ToString();
     }
 
     private string GetMessageFromHistory(ulong channel)
@@ -90,7 +43,15 @@ public class OllamaClientGenerate : IOllamaClient
         return sb.ToString();
     }
 
-    public void AddToHistory(ulong channel, string author, string message)
+    public override object CreateRequestContent(ulong channel)
+    {
+        var history = GetMessageFromHistory(channel);
+        var requestContent = new { model = _model, system = _system, prompt = _prompt.Replace("#InnerPrompt", history) };
+
+        return requestContent;
+    }
+
+    public override void AddToHistory(ulong channel, string author, string message)
     {
         if (historyChatsOfChannel.ContainsKey(channel))
             historyChatsOfChannel[channel].Enqueue($"{author}: {message}");

@@ -5,71 +5,23 @@ using System.Text;
 
 namespace DiscordBot.OllamaClasses;
 
-public class OllamaClientChat : IOllamaClient
+public class OllamaClientChat : OllamaClientBase
 {
     private const int _maxCountOfMessagesInHistory = 20;
 
-    private readonly string _apiUrl;
-    private readonly string _system;
-    private readonly string _prompt;
-    private readonly string _model;
-    private readonly HttpClient _httpClient;
-
     private Dictionary<ulong, Queue<(string author, string message)>> historyChatsOfChannel = new();
 
-    public string Name { get; private set; }
-
-    public OllamaClientChat(string apiUrl, string name, string system, string prompt, string model)
+    public OllamaClientChat(string apiUrl, string name, string systemPrompt, string prompt, string model) : base(apiUrl, name, systemPrompt, prompt, model)
     {
-        _httpClient = new HttpClient();
-        _apiUrl = apiUrl;
-        _system = system;
-        _prompt = prompt;
-        _model = model;
-
-        Name = name;
     }
 
-    public async Task<string?> GetResponseAsync(object requestContent)
+    protected override string? ParseResponseBody(string responseBody)
     {
-        var jsonContent = JsonConvert.SerializeObject(requestContent);
-        var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-        try
-        {
-            HttpResponseMessage response = await _httpClient.PostAsync(_apiUrl, httpContent);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception($"Error: {response.StatusCode} - {response.ReasonPhrase}");
-            }
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-
-            var responseObject = JsonConvert.DeserializeObject<OllamaChatResponse>(responseBody);
-
-            return responseObject!.Message.Content;
-        }
-        catch (Exception ex)
-        {
-            return $"An error occurred: {ex.Message}";
-        }
+        var responseObject = JsonConvert.DeserializeObject<OllamaChatResponse>(responseBody);
+        return responseObject?.Message?.Content;
     }
 
-
-    public void AddToHistory(ulong channel, string author, string message)
-    {
-        if (historyChatsOfChannel.ContainsKey(channel))
-            historyChatsOfChannel[channel].Enqueue((author, message));
-        else
-            historyChatsOfChannel[channel] = new Queue<(string author, string message)>(new[] { (author, message) });
-
-
-        if (historyChatsOfChannel[channel].Count > _maxCountOfMessagesInHistory)
-            historyChatsOfChannel[channel].Dequeue();
-    }
-
-    public object CreateRequestContent(ulong channel)
+    public override object CreateRequestContent(ulong channel)
     {
         Queue<(string author, string message)> historyChat = historyChatsOfChannel[channel];
 
@@ -93,4 +45,15 @@ public class OllamaClientChat : IOllamaClient
         return requestContent;
     }
 
+    public override void AddToHistory(ulong channel, string author, string message)
+    {
+        if (historyChatsOfChannel.ContainsKey(channel))
+            historyChatsOfChannel[channel].Enqueue((author, message));
+        else
+            historyChatsOfChannel[channel] = new Queue<(string author, string message)>(new[] { (author, message) });
+
+
+        if (historyChatsOfChannel[channel].Count > _maxCountOfMessagesInHistory)
+            historyChatsOfChannel[channel].Dequeue();
+    }
 }
