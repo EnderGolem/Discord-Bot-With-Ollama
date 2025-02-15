@@ -12,6 +12,7 @@ public class OllamaClientChat : IOllamaClient
     private readonly string _apiUrl;
     private readonly string _system;
     private readonly string _prompt;
+    private readonly string _model;
     private readonly HttpClient _httpClient;
     private readonly Random _random = new();
 
@@ -19,12 +20,13 @@ public class OllamaClientChat : IOllamaClient
 
     public string Name { get; private set; }
 
-    public OllamaClientChat(string apiUrl, string name, string system, string prompt)
+    public OllamaClientChat(string apiUrl, string name, string system, string prompt, string model)
     {
         _httpClient = new HttpClient();
         _apiUrl = apiUrl;
         _system = system;
         _prompt = prompt;
+        _model = model;
 
         Name = name;
     }
@@ -84,7 +86,7 @@ public class OllamaClientChat : IOllamaClient
 
         object requestContent = new
         {
-            model = "llama3",
+            model = _model,
             messages = messages,
             stream = false
         };

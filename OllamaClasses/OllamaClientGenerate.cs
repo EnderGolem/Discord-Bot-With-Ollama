@@ -12,6 +12,7 @@ public class OllamaClientGenerate : IOllamaClient
     private readonly string _apiUrl;
     private readonly string _system;
     private readonly string _prompt;
+    private readonly string _model;
     private readonly HttpClient _httpClient;
     private readonly Random _random = new();
 
@@ -20,12 +21,13 @@ public class OllamaClientGenerate : IOllamaClient
 
     public string Name { get; private set; }
 
-    public OllamaClientGenerate(string apiUrl, string name, string system, string prompt)
+    public OllamaClientGenerate(string apiUrl, string name, string system, string prompt, string model)
     {
         _httpClient = new HttpClient();
         _apiUrl = apiUrl;
         _system = system;
         _prompt = prompt;
+        _model = model;
 
         Name = name;
     }
@@ -74,7 +76,7 @@ public class OllamaClientGenerate : IOllamaClient
     public object CreateRequestContent(ulong channel)
     {
         var history = GetMessageFromHistory(channel);
-        var requestContent = new { model = "llama3", system = _system, prompt = _prompt.Replace("#InnerPrompt", history) };
+        var requestContent = new { model = _model, system = _system, prompt = _prompt.Replace("#InnerPrompt", history) };
 
         return requestContent;
     }

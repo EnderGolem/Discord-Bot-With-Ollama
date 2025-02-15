@@ -1,26 +1,67 @@
-﻿using DiscordBot.OllamaClasses;
+﻿using DiscordBot.Enums;
+using DiscordBot.OllamaClasses;
 using Microsoft.Extensions.Configuration;
 
 namespace DiscordBot;
 
-//TODO попытаться запустить на сервере
 class Program
 {
     static async Task Main(string[] args)
     {
+
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
 
-        string token = configuration["Discord:Token"]!;
+        string discordToken = configuration["Discord:Token"]
+                ?? throw new InvalidOperationException("Отсутствует значение 'Discord:Token' в конфигурации.");
+        string ollamaName = configuration["Ollama:Name"]
+                ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:Name' в конфигурации.");
+        string ollamaSystemPrompt = configuration["Ollama:SystemPromt"]
+            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:SystemPromt' в конфигурации.");
+        string ollamaPrompt = configuration["Ollama:Promt"]
+            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:Promt' в конфигурации.");
+        string ollamaModelTypeStr = configuration["Ollama:ModelType"]
+            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:ModelType' в конфигурации.");
+        string ollamaURL = configuration["Ollama:OllamaURL"]
+            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:OllamaURL' в конфигурации.");
+        string ollamaVersion = configuration["Ollama:ModelVersion"]
+            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:ModelVersion' в конфигурации.");
 
-        IOllamaClient clientOllama = ExampleWithGenerateModel();
-        DiscordClient discordClient = new DiscordClient(token, clientOllama);
+
+        if (!Enum.TryParse(ollamaModelTypeStr, true, out ModelType modelType))
+        {
+            throw new InvalidOperationException($"Некорректное значение ModelType в конфигурации: {ollamaSystemPrompt}");
+        }
+
+
+        IOllamaClient clientOllama;
+        switch (modelType)
+        {
+            case ModelType.Generate:
+                clientOllama = new OllamaClientGenerate(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion);
+                break;
+            case ModelType.Chat:
+                clientOllama = new OllamaClientChat(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion);
+                break;
+            default:
+                throw new InvalidOperationException("Не допустимое состояние системы");
+        }
+
+        Console.WriteLine("Загружена модель со следующими параметрами\n" +
+                        $"Тип: {modelType}\n" +
+                        $"Модель ollama: {ollamaVersion}\n" +
+                        $"Имя: {ollamaName}\n" +
+                        $"Системный промт: {ollamaSystemPrompt}\n" +
+                        $"Промт: {ollamaPrompt}\n" +
+                        $"URL: {ollamaURL}\n");
+
+        DiscordClient discordClient = new DiscordClient(discordToken, clientOllama);
+
 
         await discordClient.Initialize();
-
-
+        
         var _ = RunLoopAsync(() => discordClient.ProcessQueueOfMessages(), 1000);
 
         await Task.Delay(-1);
@@ -33,36 +74,5 @@ class Program
             action();
             await Task.Delay(repeatTime, token);
         }
-    }
-
-
-    private static IOllamaClient ExampleWithGenerateModel()
-    {
-        string name = "Лами";
-        string system = $"Ты {name} чат бот." +
-                        $"1) Учитывай историю чтобы сохранить контекст." +
-                        $"2) Веди себя как пользователь дискорд серверов." +
-                        $"3) Пиши коротко и дружелюбно, используя 1–2 предложения." +
-                        $"4) Отвечай всегда на русском языке.";
-        string prompt = $"Вот история переписки: {"#InnerPrompt"}" +
-                            $"Ответь на последнее сообщение, как {name}.";
-
-        IOllamaClient clientOllama = new OllamaClientGenerate("http://localhost:11434/api/generate", "Лами", system, prompt);
-        return clientOllama;
-    }
-
-    private static IOllamaClient ExampleWithChatModel()
-    {
-        string name = "Лами";
-        string system = $"Ты {name} чат бот." +
-                        $"1) Отвечай всегда на русском языке" +
-                        $"2) Учитывай историю чтобы сохранить контекст." +
-                        $"3) Веди себя как пользователь дискорд серверов." +
-                        $"4) Пиши коротко и дружелюбно, используя 1–2 предложения." +
-                        $"5) Отвечай ВСЕГДА на русском языке.";
-        string prompt = "";
-
-        IOllamaClient clientOllama = new OllamaClientChat("http://localhost:11434/api/chat", "Лами", system, prompt);
-        return clientOllama;
     }
 }
