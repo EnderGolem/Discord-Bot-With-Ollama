@@ -28,11 +28,18 @@ class Program
             ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:OllamaURL' в конфигурации.");
         string ollamaVersion = configuration["Ollama:ModelVersion"]
             ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:ModelVersion' в конфигурации.");
+        string ollamaMemoryStr = configuration["Ollama:MessageMemorisedCount"]
+            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:MessageMemorisedCount' в конфигурации.");
 
+
+        if (!int.TryParse(ollamaMemoryStr, out int ollamaMemory))
+        { 
+            throw new InvalidOperationException($"Некорректное значение MessageMemorisedCount в конфигурации: {ollamaMemory}");
+        }
 
         if (!Enum.TryParse(ollamaModelTypeStr, true, out ModelType modelType))
         {
-            throw new InvalidOperationException($"Некорректное значение ModelType в конфигурации: {ollamaSystemPrompt}");
+            throw new InvalidOperationException($"Некорректное значение ModelType в конфигурации: {ollamaModelTypeStr}");
         }
 
 
@@ -40,10 +47,10 @@ class Program
         switch (modelType)
         {
             case ModelType.Generate:
-                clientOllama = new OllamaClientGenerate(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion);
+                clientOllama = new OllamaClientGenerate(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion, ollamaMemory);
                 break;
             case ModelType.Chat:
-                clientOllama = new OllamaClientChat(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion);
+                clientOllama = new OllamaClientChat(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion, ollamaMemory);
                 break;
             default:
                 throw new InvalidOperationException("Не допустимое состояние системы");

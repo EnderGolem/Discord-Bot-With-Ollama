@@ -5,6 +5,7 @@ namespace DiscordBot.OllamaClasses;
 
 public abstract class OllamaClientBase : IOllamaClient
 {
+    protected readonly int _maxCountOfMessagesInHistory;
     protected readonly string _apiUrl;
     protected readonly string _system;
     protected readonly string _prompt;
@@ -13,12 +14,13 @@ public abstract class OllamaClientBase : IOllamaClient
 
     public string Name { get; }
 
-    protected OllamaClientBase(string apiUrl, string name, string systemPrompt, string prompt, string model)
+    protected OllamaClientBase(string apiUrl, string name, string systemPrompt, string prompt, string model, int maxCountOfMessagesInHistory)
     {
         _apiUrl = apiUrl;
         _system = systemPrompt;
         _prompt = prompt;
         _model = model;
+        _maxCountOfMessagesInHistory = maxCountOfMessagesInHistory;
         _httpClient = new HttpClient();
 
         Name = name;

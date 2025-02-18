@@ -8,6 +8,7 @@
     "Promt": "Вот история переписки: #InnerPrompt Ответь на последнее сообщение, как Лами.",
     "ModelType": "Generate",
     "ModelVersion": "llama3",
-    "OllamaURL": "http://localhost:11434/api/generate"
+    "OllamaURL": "http://localhost:11434/api/generate",
+    "MessageMemorisedCount": "20"
   }
 }

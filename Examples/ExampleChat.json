@@ -8,6 +8,7 @@
     "Promt": "",
     "ModelType": "Chat",
     "OllamaURL": "http://localhost:11434/api/chat",
-    "ModelVersion": "llama3"
+    "ModelVersion": "llama3",
+    "MessageMemorisedCount": "20"
   }
 }

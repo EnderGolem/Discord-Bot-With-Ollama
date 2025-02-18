@@ -7,11 +7,10 @@ namespace DiscordBot.OllamaClasses;
 
 public class OllamaClientChat : OllamaClientBase
 {
-    private const int _maxCountOfMessagesInHistory = 20;
-
     private Dictionary<ulong, Queue<(string author, string message)>> historyChatsOfChannel = new();
 
-    public OllamaClientChat(string apiUrl, string name, string systemPrompt, string prompt, string model) : base(apiUrl, name, systemPrompt, prompt, model)
+    public OllamaClientChat(string apiUrl, string name, string systemPrompt, string prompt, string model, int maxCountOfMessagesInHistory) :
+        base(apiUrl, name, systemPrompt, prompt, model, maxCountOfMessagesInHistory)
     {
     }
 

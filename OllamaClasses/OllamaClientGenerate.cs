@@ -7,13 +7,10 @@ namespace DiscordBot;
 
 public class OllamaClientGenerate : OllamaClientBase
 {
-    private const int _maxCountOfMessagesInHistory = 20;
-
-
-
     private Dictionary<ulong, Queue<string>> historyChatsOfChannel = new();
-
-    public OllamaClientGenerate(string apiUrl, string name, string systemPrompt, string prompt, string model) : base(apiUrl, name, systemPrompt, prompt, model)
+        
+    public OllamaClientGenerate(string apiUrl, string name, string systemPrompt, string prompt, string model, int maxCountOfMessagesInHistory) :
+        base(apiUrl, name, systemPrompt, prompt, model, maxCountOfMessagesInHistory)
     {
     }
 
