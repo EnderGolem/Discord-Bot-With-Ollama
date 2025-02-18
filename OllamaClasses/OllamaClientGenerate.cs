@@ -37,6 +37,9 @@ public class OllamaClientGenerate : OllamaClientBase
     {
         StringBuilder sb = new StringBuilder();
 
+        if (!historyChatsOfChannel.ContainsKey(channel))
+            return "";
+
         foreach (var message in historyChatsOfChannel[channel].SkipLast(1))
             sb.AppendLine(message);
 

@@ -22,6 +22,9 @@ public class OllamaClientChat : OllamaClientBase
 
     public override object CreateRequestContent(ulong channel)
     {
+        if (!historyChatsOfChannel.ContainsKey(channel))
+            return new object();
+
         Queue<(string author, string message)> historyChat = historyChatsOfChannel[channel];
 
         var messages = historyChat.Select(m => new
