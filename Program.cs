@@ -64,6 +64,8 @@ class Program
                         $"Имя: {ollamaName}\n" +
                         $"Системный промт: {ollamaSystemPrompt}\n" +
                         $"Промт: {ollamaPrompt}\n" +
+                        $"Оформление последнего сообщения: {ollamaLastMessageFormating}\n" +
+                        $"Макс количество сообщений в памяти: {ollamaMemory}\n" +
                         $"URL: {ollamaURL}\n");
 
         DiscordClient discordClient = new DiscordClient(discordToken, clientOllama);
