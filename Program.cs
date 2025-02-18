@@ -15,33 +15,32 @@ class Program
             .Build();
 
         string discordToken = configuration["Discord:Token"]
-                ?? throw new InvalidOperationException("Отсутствует значение 'Discord:Token' в конфигурации.");
+            ?? throw new InvalidOperationException("Missing 'Discord:Token' value in configuration.");
         string ollamaName = configuration["Ollama:Name"]
-                ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:Name' в конфигурации.");
+            ?? throw new InvalidOperationException("Missing 'Ollama:Name' value in configuration.");
         string ollamaSystemPrompt = configuration["Ollama:SystemPromt"]
-            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:SystemPromt' в конфигурации.");
+            ?? throw new InvalidOperationException("Missing 'Ollama:SystemPromt' value in configuration.");
         string ollamaPrompt = configuration["Ollama:Promt"]
-            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:Promt' в конфигурации.");
+            ?? throw new InvalidOperationException("Missing 'Ollama:Promt' value in configuration.");
         string ollamaModelTypeStr = configuration["Ollama:ModelType"]
-            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:ModelType' в конфигурации.");
+            ?? throw new InvalidOperationException("Missing 'Ollama:ModelType' value in configuration.");
         string ollamaURL = configuration["Ollama:OllamaURL"]
-            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:OllamaURL' в конфигурации.");
+            ?? throw new InvalidOperationException("Missing 'Ollama:OllamaURL' value in configuration.");
         string ollamaVersion = configuration["Ollama:ModelVersion"]
-            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:ModelVersion' в конфигурации.");
+            ?? throw new InvalidOperationException("Missing 'Ollama:ModelVersion' value in configuration.");
         string ollamaMemoryStr = configuration["Ollama:MessageMemorisedCount"]
-            ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:MessageMemorisedCount' в конфигурации.");
+            ?? throw new InvalidOperationException("Missing 'Ollama:MessageMemorisedCount' value in configuration.");
         string ollamaLastMessageFormating = configuration["Ollama:LastMessageFormatting"]
             ?? "";
 
-
         if (!int.TryParse(ollamaMemoryStr, out int ollamaMemory))
-        { 
-            throw new InvalidOperationException($"Некорректное значение MessageMemorisedCount в конфигурации: {ollamaMemory}");
+        {
+            throw new InvalidOperationException($"Invalid MessageMemorisedCount value in configuration: {ollamaMemory}");
         }
 
         if (!Enum.TryParse(ollamaModelTypeStr, true, out ModelType modelType))
         {
-            throw new InvalidOperationException($"Некорректное значение ModelType в конфигурации: {ollamaModelTypeStr}");
+            throw new InvalidOperationException($"Invalid ModelType value in configuration: {ollamaModelTypeStr}");
         }
 
 
@@ -55,18 +54,18 @@ class Program
                 clientOllama = new OllamaClientChat(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion, ollamaMemory);
                 break;
             default:
-                throw new InvalidOperationException("Не допустимое состояние системы");
+                throw new InvalidOperationException("Invalid system state");
         }
 
-        Console.WriteLine("Загружена модель со следующими параметрами\n" +
-                        $"Тип: {modelType}\n" +
-                        $"Модель ollama: {ollamaVersion}\n" +
-                        $"Имя: {ollamaName}\n" +
-                        $"Системный промт: {ollamaSystemPrompt}\n" +
-                        $"Промт: {ollamaPrompt}\n" +
-                        $"Оформление последнего сообщения: {ollamaLastMessageFormating}\n" +
-                        $"Макс количество сообщений в памяти: {ollamaMemory}\n" +
-                        $"URL: {ollamaURL}\n");
+        Console.WriteLine("Loaded the model with the following parameters\n" +
+                          $"Type: {modelType}\n" +
+                          $"Ollama model: {ollamaVersion}\n" +
+                          $"Name: {ollamaName}\n" +
+                          $"System prompt: {ollamaSystemPrompt}\n" +
+                          $"Prompt: {ollamaPrompt}\n" +
+                          $"Last message formatting: {ollamaLastMessageFormating}\n" +
+                          $"Max number of messages in memory: {ollamaMemory}\n" +
+                          $"URL: {ollamaURL}\n");
 
         DiscordClient discordClient = new DiscordClient(discordToken, clientOllama);
 
