@@ -3,7 +3,7 @@ using System.Text;
 
 namespace DiscordBot.OllamaClasses;
 
-public abstract class OllamaClientBase : IOllamaClient
+public abstract class OllamaClientBase : IOllamaClient, IDisposable
 {
     protected readonly int _maxCountOfMessagesInHistory;
     protected readonly string _apiUrl;
@@ -55,5 +55,10 @@ public abstract class OllamaClientBase : IOllamaClient
     public abstract object CreateRequestContent(ulong channel);
 
     public abstract void AddToHistory(ulong channel, string author, string message);
+
+    public void Dispose()
+    {
+        _httpClient?.Dispose();
+    }
 }
 

@@ -14,7 +14,7 @@ internal class DiscordClient
     private readonly string _token;
 
     private ConcurrentQueue<MessageData> _queueMessages = new();
-    private Dictionary<ulong, bool> _alwaysRespondInChannel = new();
+    private ConcurrentDictionary<ulong, bool> _alwaysRespondInChannel = new();
 
     public DiscordClient(string token, IOllamaClient ollamaClient)
     {
@@ -88,11 +88,8 @@ internal class DiscordClient
 
     public void ProcessQueueOfMessages()
     {
-        if (_queueMessages.Any())
+        if (_queueMessages.TryDequeue(out var messageData))
         {
-            if (!_queueMessages.TryDequeue(out var messageData))
-                return;
-
             if (messageData.Timestamp.AddSeconds(20) < DateTime.UtcNow)
                 return;
 
