@@ -30,6 +30,8 @@ class Program
             ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:ModelVersion' в конфигурации.");
         string ollamaMemoryStr = configuration["Ollama:MessageMemorisedCount"]
             ?? throw new InvalidOperationException("Отсутствует значение 'Ollama:MessageMemorisedCount' в конфигурации.");
+        string ollamaLastMessageFormating = configuration["Ollama:LastMessageFormatting"]
+            ?? "";
 
 
         if (!int.TryParse(ollamaMemoryStr, out int ollamaMemory))
@@ -47,7 +49,7 @@ class Program
         switch (modelType)
         {
             case ModelType.Generate:
-                clientOllama = new OllamaClientGenerate(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion, ollamaMemory);
+                clientOllama = new OllamaClientGenerate(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion, ollamaMemory, ollamaLastMessageFormating);
                 break;
             case ModelType.Chat:
                 clientOllama = new OllamaClientChat(ollamaURL, ollamaName, ollamaSystemPrompt, ollamaPrompt, ollamaVersion, ollamaMemory);

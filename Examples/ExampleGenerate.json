@@ -9,6 +9,7 @@
     "ModelType": "Generate",
     "ModelVersion": "llama3",
     "OllamaURL": "http://localhost:11434/api/generate",
-    "MessageMemorisedCount": "20"
+    "MessageMemorisedCount": "20",
+    "LastMessageFormatting": "Последнее сообщение\n#lastMessage"
   }
 }

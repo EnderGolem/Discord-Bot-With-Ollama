@@ -7,11 +7,14 @@ namespace DiscordBot;
 
 public class OllamaClientGenerate : OllamaClientBase
 {
+    private readonly string _lastMessageFormatting;
     private Dictionary<ulong, Queue<string>> historyChatsOfChannel = new();
         
-    public OllamaClientGenerate(string apiUrl, string name, string systemPrompt, string prompt, string model, int maxCountOfMessagesInHistory) :
+    public OllamaClientGenerate(string apiUrl, string name, string systemPrompt, string prompt, string model, 
+        int maxCountOfMessagesInHistory, string lastMessageFormatting = "") :
         base(apiUrl, name, systemPrompt, prompt, model, maxCountOfMessagesInHistory)
     {
+        _lastMessageFormatting = lastMessageFormatting;
     }
 
     protected override string? ParseResponseBody(string responseBody)
@@ -36,7 +39,12 @@ public class OllamaClientGenerate : OllamaClientBase
 
         foreach (var message in historyChatsOfChannel[channel].SkipLast(1))
             sb.AppendLine(message);
-        sb.AppendLine($"Последнее сообщение\n{historyChatsOfChannel[channel].Last()}");
+
+        if (!string.IsNullOrEmpty(_lastMessageFormatting))
+            sb.AppendLine(_lastMessageFormatting.Replace("#lastMessage", historyChatsOfChannel[channel].Last()));
+        else
+            sb.AppendLine(historyChatsOfChannel[channel].Last());
+
         return sb.ToString();
     }
 
