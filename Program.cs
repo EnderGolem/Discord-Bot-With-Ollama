@@ -20,8 +20,8 @@ class Program
             ?? throw new InvalidOperationException("Missing 'Ollama:Name' value in configuration.");
         string ollamaSystemPrompt = configuration["Ollama:SystemPromt"]
             ?? throw new InvalidOperationException("Missing 'Ollama:SystemPromt' value in configuration.");
-        string ollamaPrompt = configuration["Ollama:Promt"]
-            ?? throw new InvalidOperationException("Missing 'Ollama:Promt' value in configuration.");
+        string ollamaPrompt = configuration["Ollama:Prompt"]
+            ?? throw new InvalidOperationException("Missing 'Ollama:Prompt' value in configuration.");
         string ollamaModelTypeStr = configuration["Ollama:ModelType"]
             ?? throw new InvalidOperationException("Missing 'Ollama:ModelType' value in configuration.");
         string ollamaURL = configuration["Ollama:OllamaURL"]
