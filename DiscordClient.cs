@@ -13,7 +13,7 @@ internal class DiscordClient
     private readonly string _token;
 
     private Queue<MessageData> _queueMessages = new();
-    private Dictionary<ulong, bool> _alwaysResponse = new();
+    private Dictionary<ulong, bool> _alwaysRespondInChannel = new();
 
     public DiscordClient(string token, IOllamaClient ollamaClient)
     {
@@ -54,8 +54,8 @@ internal class DiscordClient
         if (arg.Author.IsBot)
             return;
 
-        if (!_alwaysResponse.ContainsKey(arg.Channel.Id))
-            _alwaysResponse[arg.Channel.Id] = true;
+        if (!_alwaysRespondInChannel.ContainsKey(arg.Channel.Id))
+            _alwaysRespondInChannel[arg.Channel.Id] = true;
 
         Console.WriteLine($"Received: {arg.Content} from {arg.Author.Username} channel: {arg.Channel.Name}");
 
@@ -75,13 +75,13 @@ internal class DiscordClient
 
         if (arg.Content.StartsWith("/alwaysChat"))
         {
-            _alwaysResponse[arg.Channel.Id] = !_alwaysResponse[arg.Channel.Id];
-            await arg.Channel.SendMessageAsync(text: $"I {(_alwaysResponse[arg.Channel.Id] ? "always respond now" : "respond only when mentioned")}", messageReference: messageReference);
+            _alwaysRespondInChannel[arg.Channel.Id] = !_alwaysRespondInChannel[arg.Channel.Id];
+            await arg.Channel.SendMessageAsync(text: $"I {(_alwaysRespondInChannel[arg.Channel.Id] ? "always respond now" : "respond only when mentioned")}", messageReference: messageReference);
             return;
         }
 
         _clientOllama.AddToHistory(arg.Channel.Id, arg.Author.Username, arg.Content);
-        if (_alwaysResponse[arg.Channel.Id] || CheckBotMentioned(arg))
+        if (_alwaysRespondInChannel[arg.Channel.Id] || CheckBotMentioned(arg))
             _queueMessages.Enqueue(new(DateTime.UtcNow, arg.Content.Replace(_clientSocketDiscord.CurrentUser.Id.ToString(), _clientOllama.Name), arg.Channel, messageReference));
     }
 
