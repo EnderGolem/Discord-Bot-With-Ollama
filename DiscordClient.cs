@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using DiscordBot.Classes;
 using DiscordBot.OllamaClasses;
+using System.Collections.Concurrent;
 
 namespace DiscordBot;
 
@@ -12,7 +13,7 @@ internal class DiscordClient
     private readonly DiscordSocketClient _clientSocketDiscord;
     private readonly string _token;
 
-    private Queue<MessageData> _queueMessages = new();
+    private ConcurrentQueue<MessageData> _queueMessages = new();
     private Dictionary<ulong, bool> _alwaysRespondInChannel = new();
 
     public DiscordClient(string token, IOllamaClient ollamaClient)
@@ -89,7 +90,8 @@ internal class DiscordClient
     {
         if (_queueMessages.Any())
         {
-            var messageData = _queueMessages.Dequeue();
+            if (!_queueMessages.TryDequeue(out var messageData))
+                return;
 
             if (messageData.Timestamp.AddSeconds(20) < DateTime.UtcNow)
                 return;

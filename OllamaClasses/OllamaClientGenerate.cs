@@ -58,14 +58,17 @@ public class OllamaClientGenerate : OllamaClientBase
 
     public override void AddToHistory(ulong channel, string author, string message)
     {
-        if (historyChatsOfChannel.ContainsKey(channel))
-            historyChatsOfChannel[channel].Enqueue($"{author}: {message}");
-        else
-            historyChatsOfChannel[channel] = new Queue<string>(new[] { $"{author}: {message}" });
+        lock (historyChatsOfChannel)
+        {
+            if (historyChatsOfChannel.ContainsKey(channel))
+                historyChatsOfChannel[channel].Enqueue($"{author}: {message}");
+            else
+                historyChatsOfChannel[channel] = new Queue<string>(new[] { $"{author}: {message}" });
 
 
-        if (historyChatsOfChannel[channel].Count > _maxCountOfMessagesInHistory)
-            historyChatsOfChannel[channel].Dequeue();
+            if (historyChatsOfChannel[channel].Count > _maxCountOfMessagesInHistory)
+                historyChatsOfChannel[channel].Dequeue();
+        }
     }
 }
 
