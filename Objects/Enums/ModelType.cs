@@ -1,4 +1,4 @@
-﻿namespace DiscordBot.Enums;
+﻿namespace DiscordBot.Objects.Enums;
 
 public enum ModelType
 {

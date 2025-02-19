@@ -1,4 +1,4 @@
-﻿using DiscordBot.Enums;
+﻿using DiscordBot.Objects.Enums;
 using DiscordBot.OllamaClasses;
 using Microsoft.Extensions.Configuration;
 
