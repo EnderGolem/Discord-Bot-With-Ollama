@@ -88,10 +88,10 @@ internal class DiscordClient
 
     public void ProcessQueueOfMessages()
     {
-        if (_queueMessages.TryDequeue(out var messageData))
+        while (_queueMessages.TryDequeue(out var messageData))
         {
             if (messageData.Timestamp.AddSeconds(20) < DateTime.UtcNow)
-                return;
+                continue;
 
             var answer = _clientOllama.GetResponseAsync(_clientOllama.CreateRequestContent(messageData.Channel.Id)).GetAwaiter().GetResult();
             if (string.IsNullOrEmpty(answer))
