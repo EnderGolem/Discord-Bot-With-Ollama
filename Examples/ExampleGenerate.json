@@ -1,12 +1,12 @@
 {
   "Discord": {
-    "Token": "WRITE YOUR TOKEN HERE"
+    "Token": "Insert Discord bot token here"
   },
   "Ollama": {
-    "Name": "Лами",
-    "SystemPromt": "Ты Лами чат бот. 1) Учитывай историю чтобы сохранить контекст. 2) Веди себя как пользователь дискорд серверов. 3) Пиши коротко и дружелюбно, используя 1–2 предложения. 4) Отвечай всегда на русском языке.",
-    "Prompt": "Вот история переписки: #InnerPrompt Ответь на последнее сообщение, как Лами.",
-    "LastMessageFormatting": "Последнее сообщение\n#lastMessage",
+    "Name": "Lami",
+    "SystemPromt": "You're a Lami chat bot. 1) Consider your history to keep context. 2) Act like a user of discord servers. 3) Write short and friendly, using 1-2 sentences. 4) Answer always in English.",
+    "Prompt": "Here's the correspondence history: #InnerPrompt Reply to the last message like Lami did.",
+    "LastMessageFormatting": "Last message:\n#lastMessage",
     "MessageMemorisedCount": "20",
     "ModelType": "Generate",
     "ModelVersion": "llama3",
