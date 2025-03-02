@@ -74,10 +74,10 @@ copy Examples/appsettings.json appsettings.json
 dotnet run
 ```
 ## Available Commands
-| | Command | Description |
+| Command           | Description                          |
 |:------------------|:----------------------------------|
-| `/ping` | testing the bot's functionality |
-| `/alwaysRespond | | switching the response mode |
+| `/ping`           | testing the bot's functionality |
+| `/alwaysRespond`  | switching the response mode       |
 
 The bot will reply:
 - To all messages (default)
